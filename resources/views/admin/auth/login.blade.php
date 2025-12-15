@@ -48,10 +48,17 @@
                 </button>
             </form>
 
-            <div class="mt-4 text-center">
-                <a href="{{ route('login') }}" class="text-sm text-indigo-600 hover:text-indigo-500">
-                    Back to User Login
-                </a>
+            <div class="mt-4 text-center space-y-2">
+                <div>
+                    <a href="{{ route('admin.password.request') }}" class="text-sm text-indigo-600 hover:text-indigo-500">
+                        Forgot your password?
+                    </a>
+                </div>
+                <div>
+                    <a href="{{ route('login') }}" class="text-sm text-indigo-600 hover:text-indigo-500">
+                        Back to User Login
+                    </a>
+                </div>
             </div>
         </div>
     </div>

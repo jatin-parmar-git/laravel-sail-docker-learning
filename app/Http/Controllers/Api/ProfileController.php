@@ -3,102 +3,47 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\ProfileUpdateRequest;
+use App\Http\Requests\Api\UpdatePasswordRequest;
+use App\Http\Requests\Api\DeleteAccountRequest;
+use App\Actions\Api\ShowProfileAction;
+use App\Actions\Api\UpdateProfileAction;
+use App\Actions\Api\UpdatePasswordAction;
+use App\Actions\Api\DeleteAccountAction;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
-use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
     /**
      * Get user profile
      */
-    public function show(Request $request)
+    public function show(Request $request, ShowProfileAction $action): JsonResponse
     {
-        return response()->json([
-            'user' => [
-                'id' => $request->user()->id,
-                'name' => $request->user()->name,
-                'email' => $request->user()->email,
-                'email_verified_at' => $request->user()->email_verified_at,
-                'type' => $request->user()->type,
-                'created_at' => $request->user()->created_at,
-                'updated_at' => $request->user()->updated_at,
-            ]
-        ]);
+        return $action->execute($request);
     }
 
     /**
      * Update user profile
      */
-    public function update(Request $request)
+    public function update(ProfileUpdateRequest $request, UpdateProfileAction $action): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $request->user()->id,
-        ]);
-
-        $user = $request->user();
-        $emailChanged = $user->email !== $request->email;
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'email_verified_at' => $emailChanged ? null : $user->email_verified_at, // Reset verification if email changed
-        ]);
-
-        return response()->json([
-            'message' => 'Profile updated successfully',
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'email_verified_at' => $user->email_verified_at,
-                'type' => $user->type,
-                'updated_at' => $user->updated_at,
-            ],
-            'email_verification_required' => $emailChanged,
-        ]);
+        return $action->execute($request);
     }
 
     /**
      * Update password
      */
-    public function updatePassword(Request $request)
+    public function updatePassword(UpdatePasswordRequest $request, UpdatePasswordAction $action): JsonResponse
     {
-        $request->validate([
-            'current_password' => 'required|current_password',
-            'password' => ['required', 'confirmed', Password::defaults()],
-        ]);
-
-        $request->user()->update([
-            'password' => Hash::make($request->password),
-        ]);
-
-        return response()->json([
-            'message' => 'Password updated successfully',
-        ]);
+        return $action->execute($request);
     }
 
     /**
      * Delete account
      */
-    public function destroy(Request $request)
+    public function destroy(DeleteAccountRequest $request, DeleteAccountAction $action): JsonResponse
     {
-        $request->validate([
-            'password' => 'required|current_password',
-        ]);
-
-        $user = $request->user();
-        
-        // Revoke all tokens
-        $user->tokens()->delete();
-        
-        // Delete user
-        $user->delete();
-
-        return response()->json([
-            'message' => 'Account deleted successfully',
-        ]);
+        return $action->execute($request);
     }
 }

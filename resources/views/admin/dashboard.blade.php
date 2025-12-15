@@ -17,6 +17,7 @@
                     </div>
                     <div class="flex items-center space-x-4">
                         <span class="text-white">Welcome, {{ auth('admin')->user()->name }}</span>
+                        <a href="{{ route('admin.profile.edit') }}" class="text-white hover:text-indigo-200">Profile</a>
                         <form method="POST" action="{{ route('admin.logout') }}">
                             @csrf
                             <button type="submit" class="bg-indigo-500 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm">
